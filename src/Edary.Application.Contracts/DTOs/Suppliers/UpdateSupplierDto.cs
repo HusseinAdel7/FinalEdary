@@ -7,8 +7,6 @@ namespace Edary.DTOs.Suppliers
         [Required]
         public string SupplierName { get; set; }
 
-        public string? SubAccountId { get; set; }
-
         public string Phone { get; set; }
         public string Email { get; set; }
         public string Address { get; set; }

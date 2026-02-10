@@ -5,9 +5,10 @@ namespace Edary.DTOs.Suppliers
     public class CreateSupplierDto
     {
         [Required]
-        public string SupplierName { get; set; }
+        public string MainAccountId { get; set; }
 
-        public string? SubAccountId { get; set; }
+        [Required]
+        public string SupplierName { get; set; }
 
         public string Phone { get; set; }
         public string Email { get; set; }

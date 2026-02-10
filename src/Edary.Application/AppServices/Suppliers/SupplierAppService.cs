@@ -2,9 +2,13 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Edary.Domain.Services.Suppliers;
+using Edary.Domain.Services.SubAccounts;
 using Edary.DTOs.Suppliers;
+using Edary.Entities.MainAccounts;
+using Edary.Entities.SubAccounts;
 using Edary.Entities.Suppliers;
 using Edary.IAppServices;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
@@ -23,27 +27,69 @@ namespace Edary.AppServices.Suppliers
         ISupplierAppService
     {
         private readonly SupplierManager _supplierManager;
+        private readonly SubAccountManager _subAccountManager;
+        private readonly IRepository<SubAccount, string> _subAccountRepository;
+        private readonly IRepository<MainAccount, string> _mainAccountRepository;
 
         public SupplierAppService(
             IRepository<Supplier, string> repository,
-            SupplierManager supplierManager)
+            SupplierManager supplierManager,
+            SubAccountManager subAccountManager,
+            IRepository<SubAccount, string> subAccountRepository,
+            IRepository<MainAccount, string> mainAccountRepository)
             : base(repository)
         {
             _supplierManager = supplierManager;
+            _subAccountManager = subAccountManager;
+            _subAccountRepository = subAccountRepository;
+            _mainAccountRepository = mainAccountRepository;
         }
 
         public override async Task<SupplierDto> CreateAsync(CreateSupplierDto input)
         {
-            var newSupplierId = GuidGenerator.Create().ToString();
+            // 1) Validate MainAccount
+            var mainAccount = await _mainAccountRepository.FindAsync(input.MainAccountId);
+            if (mainAccount == null || !mainAccount.IsActive)
+            {
+                throw new BusinessException("Edary:MainAccountNotFoundOrInactive")
+                    .WithData("MainAccountId", input.MainAccountId);
+            }
+
+            // 2) Generate SubAccount number under this MainAccount
+            var newSubAccountNumber =
+                await _subAccountManager.GenerateNewAccountNumberAsync(input.MainAccountId);
+
+            // 3) Create SubAccount with same name as Supplier
+            var newSubAccountId = GuidGenerator.Create().ToString();
+            var subAccount = new SubAccount(newSubAccountId, newSubAccountNumber)
+            {
+                MainAccountId = input.MainAccountId,
+                AccountName = input.SupplierName,
+                Title = input.SupplierName,
+                AccountType = "Supplier",
+                // Defaults to satisfy non-nullable columns
+                AccountCurrency = "EGP",
+                AccountCurrencyEn = "EGP",
+                StandardCreditRate = "0",
+                IsActive = input.IsActive ?? true,
+                AccountNameEn = input.SupplierNameEn,
+                TitleEn = input.SupplierNameEn,
+                AccountTypeEn = "Supplier",
+                Notes = input.Notes
+            };
+
+            await _subAccountRepository.InsertAsync(subAccount, autoSave: true);
+
+            // 4) Generate SupplierCode
             var newSupplierCode = await _supplierManager.GenerateNewSupplierCodeAsync();
 
+            // 5) Create Supplier linked to created SubAccount
+            var newSupplierId = GuidGenerator.Create().ToString();
             var supplier = ObjectMapper.Map<CreateSupplierDto, Supplier>(input);
 
-            // Entity<string>.Id setter is protected; use ABP helper (same pattern used by framework)
             EntityHelper.TrySetId(supplier, () => newSupplierId);
-
-            // SupplierCode is auto-generated (NOT from user)
             supplier.SupplierCode = newSupplierCode;
+            supplier.SubAccountId = subAccount.Id;
 
             var created = await Repository.InsertAsync(supplier, autoSave: true);
             return MapToGetOutputDto(created);
@@ -55,7 +101,6 @@ namespace Edary.AppServices.Suppliers
 
             // SupplierCode must not be changed by user
             supplier.SupplierName = input.SupplierName;
-            supplier.SubAccountId = input.SubAccountId;
             supplier.Phone = input.Phone;
             supplier.Email = input.Email;
             supplier.Address = input.Address;
