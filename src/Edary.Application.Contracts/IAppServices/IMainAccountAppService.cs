@@ -1,7 +1,7 @@
-﻿using Edary.DTOs.MainAccounts;
+using Edary.DTOs.MainAccounts;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
 namespace Edary.IAppServices
@@ -15,8 +15,9 @@ namespace Edary.IAppServices
            UpdateMainAccountDto         
        >
     {
-       
-
-        
+        /// <summary>
+        /// يرجع شجرة الحسابات: اسم الحساب الرئيسي (الأب) وتحته أسماء الحسابات الفرعية (الأبناء) فقط.
+        /// </summary>
+        Task<List<ChartOfAccountNodeDto>> GetChartOfAccountsAsync();
     }
 }
