@@ -195,6 +195,7 @@ namespace Edary.AppServices.MainAccounts
                     .Select(sub => new ChartOfAccountNodeDto
                     {
                         Name = sub.AccountName ?? string.Empty,
+                        NameEn = sub.AccountNameEn ?? string.Empty,
                         AccountNumber = sub.AccountNumber ?? string.Empty,
                         Children = new List<ChartOfAccountNodeDto>()
                     })
@@ -204,6 +205,7 @@ namespace Edary.AppServices.MainAccounts
             return new ChartOfAccountNodeDto
             {
                 Name = main.AccountName ?? string.Empty,
+                NameEn = main.AccountNameEn ?? string.Empty,
                 AccountNumber = main.AccountNumber ?? string.Empty,
                 Children = children
             };

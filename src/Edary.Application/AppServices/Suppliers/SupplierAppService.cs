@@ -13,6 +13,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Validation;
 
 namespace Edary.AppServices.Suppliers
 {
@@ -43,6 +44,26 @@ namespace Edary.AppServices.Suppliers
             _subAccountManager = subAccountManager;
             _subAccountRepository = subAccountRepository;
             _mainAccountRepository = mainAccountRepository;
+        }
+
+        public override async Task<SupplierDto> GetAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new AbpValidationException("معرّف المورد مطلوب");
+            }
+
+            return await base.GetAsync(id);
+        }
+
+        public override async Task DeleteAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new AbpValidationException("معرّف المورد مطلوب");
+            }
+
+            await base.DeleteAsync(id);
         }
 
         public override async Task<SupplierDto> CreateAsync(CreateSupplierDto input)

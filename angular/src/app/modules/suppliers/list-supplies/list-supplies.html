@@ -3,14 +3,13 @@
     <table class="table" id="tblSuppliers">
       <thead>
         <tr>
-          <th>Supplier Code</th>
-          <th>Supplier Name</th>
-          <th>Supplier Name En</th>
-          <th>Phone</th>
-          <th>Email</th>
-          <th>Tax Number</th>
-          <th>Status</th>
-          <th>Created Date</th>
+          <th>{{ 'Supplier::SupplierCode' | abpLocalization }}</th>
+          <th>{{ 'Supplier::SupplierName' | abpLocalization }}</th>
+          <th>{{ 'Supplier::Phone' | abpLocalization }}</th>
+          <th>{{ 'Supplier::Email' | abpLocalization }}</th>
+          <th>{{ 'Supplier::TaxNumber' | abpLocalization }}</th>
+          <th>{{ 'Supplier::Status' | abpLocalization }}</th>
+          <th>{{ 'Supplier::CreatedDate' | abpLocalization }}</th>
         </tr>
       </thead>
 
@@ -21,12 +20,8 @@
               {{ supplier.supplierCode || '-' }}
             </td>
 
-            <td data-label="Supplier Name" class="rtl">
-              {{ supplier.supplierName || '-' }}
-            </td>
-
-            <td data-label="Supplier Name En">
-              {{ supplier.supplierNameEn || '-' }}
+            <td data-label="Supplier Name">
+              {{ supplier.supplierName | bilingualName:supplier.supplierNameEn }}
             </td>
 
             <td data-label="Phone">
@@ -46,7 +41,7 @@
                 class="status"
                 [class.active]="supplier.isActive"
                 [class.inactive]="!supplier.isActive">
-                {{ supplier.isActive ? 'Active' : 'Inactive' }}
+                {{ (supplier.isActive ? 'Supplier::Active' : 'Supplier::Inactive') | abpLocalization }}
               </span>
             </td>
 
@@ -62,6 +57,6 @@
 
 <ng-template #noData>
   <div class="alert" role="alert">
-    No suppliers found
+    {{ 'Supplier::NoSuppliersFound' | abpLocalization }}
   </div>
 </ng-template>

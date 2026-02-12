@@ -1,19 +1,34 @@
 using System.ComponentModel.DataAnnotations;
+using Edary.Consts.Suppliers;
 
 namespace Edary.DTOs.Suppliers
 {
     public class UpdateSupplierDto
     {
-        [Required]
-        public string SupplierName { get; set; }
+        [Required(ErrorMessage = "اسم المورد مطلوب")]
+        [StringLength(SupplierConsts.MaxSupplierNameLength, ErrorMessage = "اسم المورد لا يمكن أن يتجاوز {1} حرف")]
+        public string SupplierName { get; set; } = string.Empty;
 
-        public string Phone { get; set; }
-        public string Email { get; set; }
-        public string Address { get; set; }
-        public string TaxNumber { get; set; }
-        public string Notes { get; set; }
+        [StringLength(SupplierConsts.MaxPhoneLength, ErrorMessage = "رقم الهاتف لا يمكن أن يتجاوز {1} حرف")]
+        public string Phone { get; set; } = string.Empty;
+
+        [EmailAddress(ErrorMessage = "البريد الإلكتروني غير صحيح")]
+        [StringLength(SupplierConsts.MaxEmailLength, ErrorMessage = "البريد الإلكتروني لا يمكن أن يتجاوز {1} حرف")]
+        public string Email { get; set; } = string.Empty;
+
+        [StringLength(SupplierConsts.MaxAddressLength, ErrorMessage = "العنوان لا يمكن أن يتجاوز {1} حرف")]
+        public string Address { get; set; } = string.Empty;
+
+        [StringLength(SupplierConsts.MaxTaxNumberLength, ErrorMessage = "الرقم الضريبي لا يمكن أن يتجاوز {1} حرف")]
+        public string TaxNumber { get; set; } = string.Empty;
+
+        [StringLength(SupplierConsts.MaxNotesLength, ErrorMessage = "الملاحظات لا يمكن أن تتجاوز {1} حرف")]
+        public string Notes { get; set; } = string.Empty;
+
         public bool? IsActive { get; set; }
-        public string SupplierNameEn { get; set; }
+
+        [StringLength(SupplierConsts.MaxSupplierNameEnLength, ErrorMessage = "اسم المورد بالإنجليزية لا يمكن أن يتجاوز {1} حرف")]
+        public string SupplierNameEn { get; set; } = string.Empty;
     }
 }
 

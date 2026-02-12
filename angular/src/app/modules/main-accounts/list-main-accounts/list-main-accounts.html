@@ -3,14 +3,12 @@
     <table class="table" id="tblGrid">
       <thead>
         <tr>
-          <th>Account Number</th>
-          <th>Account Name</th>
-          <th>Account Name En</th>
-          <th>Title</th>
-          <th>Title En</th>
-          <th>Transferred To</th>
-          <th>Status</th>
-          <th>Created Date</th>
+          <th>{{ 'MainAccount::AccountNumber' | abpLocalization }}</th>
+          <th>{{ 'MainAccount::AccountName' | abpLocalization }}</th>
+          <th>{{ 'MainAccount::Title' | abpLocalization }}</th>
+          <th>{{ 'MainAccount::TransferredTo' | abpLocalization }}</th>
+          <th>{{ 'MainAccount::Status' | abpLocalization }}</th>
+          <th>{{ 'MainAccount::CreatedDate' | abpLocalization }}</th>
         </tr>
       </thead>
 
@@ -18,43 +16,38 @@
         <ng-container *ngFor="let account of accounts; trackBy: trackById">
           <tr>
             <td data-label="Account Number">{{ account.accountNumber || '-' }}</td>
-            <td data-label="Account Name" class="rtl">{{ account.accountName || '-' }}</td>
-            <td data-label="Account Name En">{{ account.accountNameEn || '-' }}</td>
-            <td data-label="Title">{{ account.title || '-' }}</td>
-            <td data-label="Title En">{{ account.titleEn || '-' }}</td>
-            <td data-label="Transferred To">{{ account.transferredTo || '-' }}</td>
+            <td data-label="Account Name">{{ account.accountName | bilingualName:account.accountNameEn }}</td>
+            <td data-label="Title">{{ account.title | bilingualName:account.titleEn }}</td>
+            <td data-label="Transferred To">{{ account.transferredTo | bilingualName:account.transferredToEn }}</td>
             <td data-label="Status">
               <span
                 class="status"
                 [class.active]="account.isActive"
                 [class.inactive]="!account.isActive">
-                {{ account.isActive ? 'Active' : 'Inactive' }}
+                {{ (account.isActive ? 'MainAccount::Active' : 'MainAccount::Inactive') | abpLocalization }}
               </span>
             </td>
             <td data-label="Created Date">
-              {{ account.createdDate | date:'medium' }}
+              {{ account.creationTime | date:'medium' }}
             </td>
           </tr>
 
-          <!-- Optional: Children accounts -->
           <ng-container *ngIf="account.children?.length > 0">
             <tr *ngFor="let child of account.children" class="child-row">
               <td data-label="Account Number">{{ child.accountNumber || '-' }}</td>
-              <td data-label="Account Name" class="rtl">{{ child.accountName || '-' }}</td>
-              <td data-label="Account Name En">{{ child.accountNameEn || '-' }}</td>
-              <td data-label="Title">{{ child.title || '-' }}</td>
-              <td data-label="Title En">{{ child.titleEn || '-' }}</td>
-              <td data-label="Transferred To">{{ child.transferredTo || '-' }}</td>
+              <td data-label="Account Name">{{ child.accountName | bilingualName:child.accountNameEn }}</td>
+              <td data-label="Title">{{ child.title | bilingualName:child.titleEn }}</td>
+              <td data-label="Transferred To">{{ child.transferredTo | bilingualName:child.transferredToEn }}</td>
               <td data-label="Status">
                 <span
                   class="status"
                   [class.active]="child.isActive"
                   [class.inactive]="!child.isActive">
-                  {{ child.isActive ? 'Active' : 'Inactive' }}
+                  {{ (child.isActive ? 'MainAccount::Active' : 'MainAccount::Inactive') | abpLocalization }}
                 </span>
               </td>
               <td data-label="Created Date">
-                {{ child.createdDate | date:'medium' }}
+                {{ child.creationTime | date:'medium' }}
               </td>
             </tr>
           </ng-container>
@@ -66,6 +59,6 @@
 
 <ng-template #noData>
   <div class="alert" role="alert">
-    No accounts found
+    {{ 'MainAccount::NoAccountsFound' | abpLocalization }}
   </div>
 </ng-template>

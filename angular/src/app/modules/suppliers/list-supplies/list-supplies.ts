@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { SupplierService } from 'src/app/proxy/app-services/suppliers';
 import { SupplierDto, SupplierPagedRequestDto } from 'src/app/proxy/dtos/suppliers';
+import { BilingualNamePipe } from 'src/app/shared/pipes/bilingual-name.pipe';
+import { LocalizationPipe } from '@abp/ng.core';
 
 @Component({
   selector: 'app-list-supplies',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BilingualNamePipe, LocalizationPipe],
   templateUrl: './list-supplies.html',
   styleUrl: './list-supplies.scss'
 })
