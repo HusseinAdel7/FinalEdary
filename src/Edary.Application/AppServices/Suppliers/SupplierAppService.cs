@@ -68,49 +68,55 @@ namespace Edary.AppServices.Suppliers
 
         public override async Task<SupplierDto> CreateAsync(CreateSupplierDto input)
         {
-            // 1) Validate MainAccount
-            var mainAccount = await _mainAccountRepository.FindAsync(input.MainAccountId);
+            if (string.IsNullOrWhiteSpace(input.SupplierName))
+                throw new AbpValidationException("اسم المورد مطلوب");
+            if (string.IsNullOrWhiteSpace(input.MainAccountId))
+                throw new AbpValidationException("معرّف الحساب الرئيسي مطلوب");
+
+            var mainAccount = await _mainAccountRepository.FindAsync(input.MainAccountId.Trim());
             if (mainAccount == null || !mainAccount.IsActive)
-            {
                 throw new BusinessException("Edary:MainAccountNotFoundOrInactive")
                     .WithData("MainAccountId", input.MainAccountId);
-            }
 
-            // 2) Generate SubAccount number under this MainAccount
             var newSubAccountNumber =
-                await _subAccountManager.GenerateNewAccountNumberAsync(input.MainAccountId);
+                await _subAccountManager.GenerateNewAccountNumberAsync(input.MainAccountId.Trim());
 
-            // 3) Create SubAccount with same name as Supplier
             var newSubAccountId = GuidGenerator.Create().ToString();
+            var supplierName = input.SupplierName.Trim();
             var subAccount = new SubAccount(newSubAccountId, newSubAccountNumber)
             {
-                MainAccountId = input.MainAccountId,
-                AccountName = input.SupplierName,
-                Title = input.SupplierName,
+                MainAccountId = input.MainAccountId.Trim(),
+                AccountName = supplierName,
+                Title = supplierName,
                 AccountType = "Supplier",
-                // Defaults to satisfy non-nullable columns
                 AccountCurrency = "EGP",
                 AccountCurrencyEn = "EGP",
                 StandardCreditRate = "0",
                 IsActive = input.IsActive ?? true,
-                AccountNameEn = input.SupplierNameEn,
-                TitleEn = input.SupplierNameEn,
+                AccountNameEn = string.IsNullOrWhiteSpace(input.SupplierNameEn) ? null : input.SupplierNameEn.Trim(),
+                TitleEn = string.IsNullOrWhiteSpace(input.SupplierNameEn) ? null : input.SupplierNameEn.Trim(),
                 AccountTypeEn = "Supplier",
-                Notes = input.Notes
+                Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim()
             };
 
             await _subAccountRepository.InsertAsync(subAccount, autoSave: true);
 
-            // 4) Generate SupplierCode
             var newSupplierCode = await _supplierManager.GenerateNewSupplierCodeAsync();
-
-            // 5) Create Supplier linked to created SubAccount
             var newSupplierId = GuidGenerator.Create().ToString();
-            var supplier = ObjectMapper.Map<CreateSupplierDto, Supplier>(input);
-
-            EntityHelper.TrySetId(supplier, () => newSupplierId);
-            supplier.SupplierCode = newSupplierCode;
-            supplier.SubAccountId = subAccount.Id;
+            var supplier = new Supplier
+            {
+                Id = newSupplierId,
+                SupplierCode = newSupplierCode,
+                SubAccountId = subAccount.Id,
+                SupplierName = supplierName,
+                Phone = string.IsNullOrWhiteSpace(input.Phone) ? null : input.Phone.Trim(),
+                Email = string.IsNullOrWhiteSpace(input.Email) ? null : input.Email.Trim(),
+                Address = string.IsNullOrWhiteSpace(input.Address) ? null : input.Address.Trim(),
+                TaxNumber = string.IsNullOrWhiteSpace(input.TaxNumber) ? null : input.TaxNumber.Trim(),
+                Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim(),
+                IsActive = input.IsActive ?? true,
+                SupplierNameEn = string.IsNullOrWhiteSpace(input.SupplierNameEn) ? null : input.SupplierNameEn.Trim()
+            };
 
             var created = await Repository.InsertAsync(supplier, autoSave: true);
             return MapToGetOutputDto(created);
@@ -118,17 +124,21 @@ namespace Edary.AppServices.Suppliers
 
         public override async Task<SupplierDto> UpdateAsync(string id, UpdateSupplierDto input)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new AbpValidationException("معرّف المورد مطلوب");
+            if (string.IsNullOrWhiteSpace(input.SupplierName))
+                throw new AbpValidationException("اسم المورد مطلوب");
+
             var supplier = await Repository.GetAsync(id);
 
-            // SupplierCode must not be changed by user
-            supplier.SupplierName = input.SupplierName;
-            supplier.Phone = input.Phone;
-            supplier.Email = input.Email;
-            supplier.Address = input.Address;
-            supplier.TaxNumber = input.TaxNumber;
-            supplier.Notes = input.Notes;
+            supplier.SupplierName = input.SupplierName.Trim();
+            supplier.Phone = string.IsNullOrWhiteSpace(input.Phone) ? null : input.Phone.Trim();
+            supplier.Email = string.IsNullOrWhiteSpace(input.Email) ? null : input.Email.Trim();
+            supplier.Address = string.IsNullOrWhiteSpace(input.Address) ? null : input.Address.Trim();
+            supplier.TaxNumber = string.IsNullOrWhiteSpace(input.TaxNumber) ? null : input.TaxNumber.Trim();
+            supplier.Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim();
             supplier.IsActive = input.IsActive;
-            supplier.SupplierNameEn = input.SupplierNameEn;
+            supplier.SupplierNameEn = string.IsNullOrWhiteSpace(input.SupplierNameEn) ? null : input.SupplierNameEn.Trim();
 
             var updated = await Repository.UpdateAsync(supplier, autoSave: true);
             return MapToGetOutputDto(updated);

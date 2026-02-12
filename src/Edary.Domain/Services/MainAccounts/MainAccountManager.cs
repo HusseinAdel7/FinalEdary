@@ -53,7 +53,7 @@ namespace Edary.Domain.Services.MainAccounts
                 var queryable = await _mainAccountRepository.GetQueryableAsync().ConfigureAwait(false);
                 var maxChildAccountNumber = queryable
                     .Where(ma => ma.ParentMainAccountId == parentMainAccountId)
-                    .Select(ma => ma.AccountNumber)
+                    .Select(ma => ma.AccountNumber) .OrderByDescending(an => an)
                     .OrderByDescending(an => an)
                     .FirstOrDefault();
 

@@ -8,6 +8,7 @@ using Edary.IAppServices;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Validation;
 
 namespace Edary.AppServices.Warehouses
 {
@@ -31,18 +32,32 @@ namespace Edary.AppServices.Warehouses
             _warehouseManager = warehouseManager;
         }
 
+        public override async Task<WarehouseDto> GetAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new AbpValidationException("معرّف المستودع مطلوب");
+            return await base.GetAsync(id);
+        }
+
         public override async Task<WarehouseDto> CreateAsync(CreateWarehouseDto input)
         {
-            // توليد كود المخزن دائماً من السيرفر (لا يؤخذ من الواجهة)
+            if (string.IsNullOrWhiteSpace(input.WarehouseName))
+                throw new AbpValidationException("اسم المستودع مطلوب");
+
             var generatedCode = await _warehouseManager.GenerateNewWarehouseCodeAsync();
 
-            var warehouse = ObjectMapper.Map<CreateWarehouseDto, Warehouse>(input);
-            warehouse.WarehouseCode = generatedCode;
-
-            // نضمن وجود Id
-            Volo.Abp.Domain.Entities.EntityHelper.TrySetId(
-                warehouse,
-                () => GuidGenerator.Create().ToString());
+            var warehouse = new Warehouse
+            {
+                Id = GuidGenerator.Create().ToString(),
+                WarehouseCode = generatedCode,
+                WarehouseName = input.WarehouseName.Trim(),
+                Location = string.IsNullOrWhiteSpace(input.Location) ? null : input.Location.Trim(),
+                ManagerName = string.IsNullOrWhiteSpace(input.ManagerName) ? null : input.ManagerName.Trim(),
+                Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim(),
+                IsActive = input.IsActive,
+                WarehouseNameEn = string.IsNullOrWhiteSpace(input.WarehouseNameEn) ? null : input.WarehouseNameEn.Trim(),
+                ManagerNameEn = string.IsNullOrWhiteSpace(input.ManagerNameEn) ? null : input.ManagerNameEn.Trim()
+            };
 
             var created = await Repository.InsertAsync(warehouse, autoSave: true);
             return MapToGetOutputDto(created);
@@ -50,19 +65,30 @@ namespace Edary.AppServices.Warehouses
 
         public override async Task<WarehouseDto> UpdateAsync(string id, UpdateWarehouseDto input)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new AbpValidationException("معرّف المستودع مطلوب");
+            if (string.IsNullOrWhiteSpace(input.WarehouseName))
+                throw new AbpValidationException("اسم المستودع مطلوب");
+
             var warehouse = await Repository.GetAsync(id);
 
-            // لا نسمح بتعديل WarehouseCode من الـ Update
-            warehouse.WarehouseName = input.WarehouseName;
-            warehouse.Location = input.Location;
-            warehouse.ManagerName = input.ManagerName;
-            warehouse.Notes = input.Notes;
+            warehouse.WarehouseName = input.WarehouseName.Trim();
+            warehouse.Location = string.IsNullOrWhiteSpace(input.Location) ? null : input.Location.Trim();
+            warehouse.ManagerName = string.IsNullOrWhiteSpace(input.ManagerName) ? null : input.ManagerName.Trim();
+            warehouse.Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim();
             warehouse.IsActive = input.IsActive;
-            warehouse.WarehouseNameEn = input.WarehouseNameEn;
-            warehouse.ManagerNameEn = input.ManagerNameEn;
+            warehouse.WarehouseNameEn = string.IsNullOrWhiteSpace(input.WarehouseNameEn) ? null : input.WarehouseNameEn.Trim();
+            warehouse.ManagerNameEn = string.IsNullOrWhiteSpace(input.ManagerNameEn) ? null : input.ManagerNameEn.Trim();
 
             var updated = await Repository.UpdateAsync(warehouse, autoSave: true);
             return MapToGetOutputDto(updated);
+        }
+
+        public override async Task DeleteAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new AbpValidationException("معرّف المستودع مطلوب");
+            await base.DeleteAsync(id);
         }
 
         public override async Task<PagedResultDto<WarehouseDto>> GetListAsync(WarehousePagedRequestDto input)

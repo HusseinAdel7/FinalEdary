@@ -9,6 +9,9 @@ using System.Linq;
 using Volo.Abp.Domain.Entities;
 using System.Linq.Dynamic.Core;
 using Volo.Abp.Application.Dtos;
+using Edary.Entities.MainAccounts;
+using Volo.Abp;
+using Volo.Abp.Validation;
 
 namespace Edary.AppServices.SubAccounts
 {
@@ -23,37 +26,95 @@ namespace Edary.AppServices.SubAccounts
       ISubAccountAppService
     {
         private readonly SubAccountManager _subAccountManager;
+        private readonly IRepository<MainAccount, string> _mainAccountRepository;
 
         public SubAccountAppService(
             IRepository<SubAccount, string> repository,
-            SubAccountManager subAccountManager)
+            SubAccountManager subAccountManager,
+            IRepository<MainAccount, string> mainAccountRepository)
             : base(repository)
         {
             _subAccountManager = subAccountManager;
+            _mainAccountRepository = mainAccountRepository;
         }
 
         public override async Task<SubAccountDto> CreateAsync(CreateSubAccountDto input)
         {
+            // Validate MainAccount exists and is active
+            var mainAccount = await _mainAccountRepository.FindAsync(input.MainAccountId);
+            if (mainAccount == null)
+            {
+                throw new EntityNotFoundException(typeof(MainAccount), input.MainAccountId);
+            }
+
+            if (!mainAccount.IsActive)
+            {
+                throw new BusinessException("Edary:MainAccountInactive")
+                    .WithData("MainAccountId", input.MainAccountId);
+            }
+
+            // Validate decimal ranges (business logic validation)
+            if (input.CreditAmount.HasValue && input.CreditAmount.Value < 0)
+            {
+                throw new AbpValidationException("مبلغ الائتمان لا يمكن أن يكون سالباً");
+            }
+
+            if (input.Commission.HasValue && input.Commission.Value < 0)
+            {
+                throw new AbpValidationException("العمولة لا يمكن أن تكون سالبة");
+            }
+
+            if (input.Percentage.HasValue && (input.Percentage.Value < 0 || input.Percentage.Value > 100))
+            {
+                throw new AbpValidationException("النسبة المئوية يجب أن تكون بين 0 و 100");
+            }
+
+            // Validate required strings are not empty/whitespace
+            if (string.IsNullOrWhiteSpace(input.AccountName))
+            {
+                throw new AbpValidationException("اسم الحساب مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.Title))
+            {
+                throw new AbpValidationException("العنوان مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.AccountType))
+            {
+                throw new AbpValidationException("نوع الحساب مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.StandardCreditRate))
+            {
+                throw new AbpValidationException("معدل الائتمان القياسي مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.AccountCurrency))
+            {
+                throw new AbpValidationException("عملة الحساب مطلوبة");
+            }
+
             var newAccountId = GuidGenerator.Create().ToString();
             var newAccountNumber = await _subAccountManager.GenerateNewAccountNumberAsync(input.MainAccountId);
 
             var subAccount = new SubAccount(newAccountId, newAccountNumber)
             {
-                AccountName = input.AccountName,
+                AccountName = input.AccountName.Trim(),
                 MainAccountId = input.MainAccountId,
-                Title = input.Title,
-                AccountType = input.AccountType,
+                Title = input.Title.Trim(),
+                AccountType = input.AccountType.Trim(),
                 CreditAmount = input.CreditAmount,
-                StandardCreditRate = input.StandardCreditRate,
+                StandardCreditRate = input.StandardCreditRate.Trim(),
                 Commission = input.Commission,
                 Percentage = input.Percentage,
-                AccountCurrency = input.AccountCurrency,
-                Notes = input.Notes,
-                IsActive = input.IsActive,
-                AccountNameEn = input.AccountNameEn,
-                TitleEn = input.TitleEn,
-                AccountTypeEn = input.AccountTypeEn,
-                AccountCurrencyEn = input.AccountCurrencyEn
+                AccountCurrency = input.AccountCurrency.Trim(),
+                Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim(),
+                IsActive = input.IsActive ?? true,
+                AccountNameEn = string.IsNullOrWhiteSpace(input.AccountNameEn) ? null : input.AccountNameEn.Trim(),
+                TitleEn = string.IsNullOrWhiteSpace(input.TitleEn) ? null : input.TitleEn.Trim(),
+                AccountTypeEn = string.IsNullOrWhiteSpace(input.AccountTypeEn) ? null : input.AccountTypeEn.Trim(),
+                AccountCurrencyEn = string.IsNullOrWhiteSpace(input.AccountCurrencyEn) ? null : input.AccountCurrencyEn.Trim()
             };
 
             var createdAccount = await Repository.InsertAsync(subAccount, autoSave: true);
@@ -63,25 +124,86 @@ namespace Edary.AppServices.SubAccounts
 
         public override async Task<SubAccountDto> UpdateAsync(string id, UpdateSubAccountDto input)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new AbpValidationException("معرّف الحساب الفرعي مطلوب");
+            }
+
             var subAccount = await Repository.GetAsync(id);
 
+            // Validate MainAccount exists and is active (if changed)
+            if (subAccount.MainAccountId != input.MainAccountId)
+            {
+                var mainAccount = await _mainAccountRepository.FindAsync(input.MainAccountId);
+                if (mainAccount == null)
+                {
+                    throw new EntityNotFoundException(typeof(MainAccount), input.MainAccountId);
+                }
 
+                if (!mainAccount.IsActive)
+                {
+                    throw new BusinessException("Edary:MainAccountInactive")
+                        .WithData("MainAccountId", input.MainAccountId);
+                }
+            }
 
-            subAccount.AccountName = input.AccountName;
+            // Validate decimal ranges (business logic validation)
+            if (input.CreditAmount.HasValue && input.CreditAmount.Value < 0)
+            {
+                throw new AbpValidationException("مبلغ الائتمان لا يمكن أن يكون سالباً");
+            }
+
+            if (input.Commission.HasValue && input.Commission.Value < 0)
+            {
+                throw new AbpValidationException("العمولة لا يمكن أن تكون سالبة");
+            }
+
+            if (input.Percentage.HasValue && (input.Percentage.Value < 0 || input.Percentage.Value > 100))
+            {
+                throw new AbpValidationException("النسبة المئوية يجب أن تكون بين 0 و 100");
+            }
+
+            // Validate required strings are not empty/whitespace
+            if (string.IsNullOrWhiteSpace(input.AccountName))
+            {
+                throw new AbpValidationException("اسم الحساب مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.Title))
+            {
+                throw new AbpValidationException("العنوان مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.AccountType))
+            {
+                throw new AbpValidationException("نوع الحساب مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.StandardCreditRate))
+            {
+                throw new AbpValidationException("معدل الائتمان القياسي مطلوب");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.AccountCurrency))
+            {
+                throw new AbpValidationException("عملة الحساب مطلوبة");
+            }
+
+            subAccount.AccountName = input.AccountName.Trim();
             subAccount.MainAccountId = input.MainAccountId;
-            subAccount.Title = input.Title;
-            subAccount.AccountType = input.AccountType;
+            subAccount.Title = input.Title.Trim();
+            subAccount.AccountType = input.AccountType.Trim();
             subAccount.CreditAmount = input.CreditAmount;
-            subAccount.StandardCreditRate = input.StandardCreditRate;
+            subAccount.StandardCreditRate = input.StandardCreditRate.Trim();
             subAccount.Commission = input.Commission;
             subAccount.Percentage = input.Percentage;
-            subAccount.AccountCurrency = input.AccountCurrency;
-            subAccount.Notes = input.Notes;
+            subAccount.AccountCurrency = input.AccountCurrency.Trim();
+            subAccount.Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim();
             subAccount.IsActive = input.IsActive;
-            subAccount.AccountNameEn = input.AccountNameEn;
-            subAccount.TitleEn = input.TitleEn;
-            subAccount.AccountTypeEn = input.AccountTypeEn;
-            subAccount.AccountCurrencyEn = input.AccountCurrencyEn;
+            subAccount.AccountNameEn = string.IsNullOrWhiteSpace(input.AccountNameEn) ? null : input.AccountNameEn.Trim();
+            subAccount.TitleEn = string.IsNullOrWhiteSpace(input.TitleEn) ? null : input.TitleEn.Trim();
+            subAccount.AccountTypeEn = string.IsNullOrWhiteSpace(input.AccountTypeEn) ? null : input.AccountTypeEn.Trim();
+            subAccount.AccountCurrencyEn = string.IsNullOrWhiteSpace(input.AccountCurrencyEn) ? null : input.AccountCurrencyEn.Trim();
 
             var updatedAccount = await Repository.UpdateAsync(subAccount, autoSave: true);
 
