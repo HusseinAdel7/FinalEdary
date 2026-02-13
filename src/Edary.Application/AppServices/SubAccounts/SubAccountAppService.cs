@@ -215,6 +215,7 @@ namespace Edary.AppServices.SubAccounts
             return MapToGetOutputDto(updatedAccount);
         }
 
+        [Authorize(EdaryPermissions.SubAccounts.List)]
         public override async Task<PagedResultDto<SubAccountDto>> GetListAsync(SubAccountPagedRequestDto input)
         {
             var query = await Repository.GetQueryableAsync();

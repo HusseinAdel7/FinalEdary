@@ -53,6 +53,7 @@ namespace Edary.AppServices.Items
             return ObjectMapper.Map<Item, ItemDto>(item);
         }
 
+        [Authorize(EdaryPermissions.Items.List)]
         public override async Task<PagedResultDto<ItemDto>> GetListAsync(ItemPagedRequestDto input)
         {
             var query = await _itemRepository.GetQueryableAsync();

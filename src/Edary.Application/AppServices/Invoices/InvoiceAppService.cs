@@ -67,6 +67,7 @@ namespace Edary.AppServices.Invoices
             return ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
         }
 
+        [Authorize(EdaryPermissions.Invoices.List)]
         public override async Task<PagedResultDto<InvoiceDto>> GetListAsync(InvoicePagedRequestDto input)
         {
             var query = await Repository.WithDetailsAsync(x => x.InvoiceDetails);

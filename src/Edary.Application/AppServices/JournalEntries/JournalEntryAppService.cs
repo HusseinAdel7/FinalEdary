@@ -54,6 +54,7 @@ namespace Edary.AppServices.JournalEntries
             return ObjectMapper.Map<JournalEntry, JournalEntryDto>(journalEntry.FirstOrDefault(x => x.Id == id));
         }
 
+        [Authorize(EdaryPermissions.JournalEntries.List)]
         public override async Task<PagedResultDto<JournalEntryDto>> GetListAsync(GetJournalEntryListInput input)
         {
             var query = await _journalEntryRepository.WithDetailsAsync(x => x.JournalEntryDetails);

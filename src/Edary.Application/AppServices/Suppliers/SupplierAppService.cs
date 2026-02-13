@@ -149,6 +149,7 @@ namespace Edary.AppServices.Suppliers
             return MapToGetOutputDto(updated);
         }
 
+        [Authorize(EdaryPermissions.Suppliers.List)]
         public override async Task<PagedResultDto<SupplierDto>> GetListAsync(SupplierPagedRequestDto input)
         {
             var query = await Repository.GetQueryableAsync();

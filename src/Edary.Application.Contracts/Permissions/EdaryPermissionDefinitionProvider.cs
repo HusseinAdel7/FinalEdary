@@ -15,6 +15,9 @@ public class EdaryPermissionDefinitionProvider : PermissionDefinitionProvider
             EdaryPermissions.Items.Default,
             L("Permission:Items"));
         itemsPermission.AddChild(
+            EdaryPermissions.Items.List,
+            L("Permission:Items.List"));
+        itemsPermission.AddChild(
             EdaryPermissions.Items.Create,
             L("Permission:Items.Create"));
         itemsPermission.AddChild(
@@ -28,6 +31,9 @@ public class EdaryPermissionDefinitionProvider : PermissionDefinitionProvider
         var warehousesPermission = edaryGroup.AddPermission(
             EdaryPermissions.Warehouses.Default,
             L("Permission:Warehouses"));
+        warehousesPermission.AddChild(
+            EdaryPermissions.Warehouses.List,
+            L("Permission:Warehouses.List"));
         warehousesPermission.AddChild(
             EdaryPermissions.Warehouses.Create,
             L("Permission:Warehouses.Create"));
@@ -43,6 +49,9 @@ public class EdaryPermissionDefinitionProvider : PermissionDefinitionProvider
             EdaryPermissions.Suppliers.Default,
             L("Permission:Suppliers"));
         suppliersPermission.AddChild(
+            EdaryPermissions.Suppliers.List,
+            L("Permission:Suppliers.List"));
+        suppliersPermission.AddChild(
             EdaryPermissions.Suppliers.Create,
             L("Permission:Suppliers.Create"));
         suppliersPermission.AddChild(
@@ -56,6 +65,9 @@ public class EdaryPermissionDefinitionProvider : PermissionDefinitionProvider
         var mainAccountsPermission = edaryGroup.AddPermission(
             EdaryPermissions.MainAccounts.Default,
             L("Permission:MainAccounts"));
+        mainAccountsPermission.AddChild(
+            EdaryPermissions.MainAccounts.List,
+            L("Permission:MainAccounts.List"));
         mainAccountsPermission.AddChild(
             EdaryPermissions.MainAccounts.Create,
             L("Permission:MainAccounts.Create"));
@@ -71,6 +83,9 @@ public class EdaryPermissionDefinitionProvider : PermissionDefinitionProvider
             EdaryPermissions.SubAccounts.Default,
             L("Permission:SubAccounts"));
         subAccountsPermission.AddChild(
+            EdaryPermissions.SubAccounts.List,
+            L("Permission:SubAccounts.List"));
+        subAccountsPermission.AddChild(
             EdaryPermissions.SubAccounts.Create,
             L("Permission:SubAccounts.Create"));
         subAccountsPermission.AddChild(
@@ -85,6 +100,9 @@ public class EdaryPermissionDefinitionProvider : PermissionDefinitionProvider
             EdaryPermissions.JournalEntries.Default,
             L("Permission:JournalEntries"));
         journalEntriesPermission.AddChild(
+            EdaryPermissions.JournalEntries.List,
+            L("Permission:JournalEntries.List"));
+        journalEntriesPermission.AddChild(
             EdaryPermissions.JournalEntries.Create,
             L("Permission:JournalEntries.Create"));
         journalEntriesPermission.AddChild(
@@ -98,6 +116,9 @@ public class EdaryPermissionDefinitionProvider : PermissionDefinitionProvider
         var invoicesPermission = edaryGroup.AddPermission(
             EdaryPermissions.Invoices.Default,
             L("Permission:Invoices"));
+        invoicesPermission.AddChild(
+            EdaryPermissions.Invoices.List,
+            L("Permission:Invoices.List"));
         invoicesPermission.AddChild(
             EdaryPermissions.Invoices.Create,
             L("Permission:Invoices.Create"));

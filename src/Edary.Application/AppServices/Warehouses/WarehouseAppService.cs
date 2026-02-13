@@ -97,6 +97,7 @@ namespace Edary.AppServices.Warehouses
             await base.DeleteAsync(id);
         }
 
+        [Authorize(EdaryPermissions.Warehouses.List)]
         public override async Task<PagedResultDto<WarehouseDto>> GetListAsync(WarehousePagedRequestDto input)
         {
             var query = await Repository.GetQueryableAsync();

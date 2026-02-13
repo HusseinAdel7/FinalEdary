@@ -109,6 +109,7 @@ namespace Edary.AppServices.MainAccounts
             return MapToGetOutputDto(updatedAccount);
         }
 
+        [Authorize(EdaryPermissions.MainAccounts.List)]
         public override async Task<PagedResultDto<MainAccountDto>> GetListAsync(MainAccountPagedRequestDto input)
         {
             var query = await Repository.GetQueryableAsync();
