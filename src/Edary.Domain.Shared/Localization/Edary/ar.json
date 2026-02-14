@@ -12,6 +12,7 @@
     "MainAccount::Inactive": "غير نشط",
     "MainAccount::CreatedDate": "تاريخ الإنشاء",
     "MainAccount::NoAccountsFound": "لا توجد حسابات",
+    "MainAccount::AddMainAccount": "إضافة حساب رئيسي",
     "Menu:MainAccounts": "الحسابات الرئيسية",
     "Menu:SubAccounts": "الحسابات الفرعية",
     "Menu:Accounting": "المحاسبة",

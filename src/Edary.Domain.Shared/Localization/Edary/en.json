@@ -14,6 +14,7 @@
     "MainAccount::Inactive": "Inactive",
     "MainAccount::CreatedDate": "Created Date",
     "MainAccount::NoAccountsFound": "No accounts found",
+    "MainAccount::AddMainAccount": "Add Main Account",
     "Menu:MainAccounts": "Main Accounts",
     "Menu:SubAccounts": "Sub Accounts",
     "Menu:Accounting": "Accounting",

@@ -1,3 +1,9 @@
+<div class="list-header">
+  <button type="button" class="btn btn-primary" routerLink="/main-accounts/create">
+    {{ 'MainAccount::AddMainAccount' | abpLocalization }}
+  </button>
+</div>
+
 <div *ngIf="accounts?.length > 0; else noData">
   <div class="table-wrapper">
     <table class="table" id="tblGrid">

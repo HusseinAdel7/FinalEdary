@@ -1,1 +1,134 @@
-<p>add-main-accounts works!</p>
+<div class="card shadow-sm">
+  <div class="card-header">
+    <h4 class="card-title mb-0">
+      Create Main Account
+    </h4>
+  </div>
+
+  <div class="card-body">
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <!-- Account Name -->
+      <div class="mb-3">
+        <label class="form-label">Account Name *</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="accountName"
+          placeholder="Enter account name"
+        />
+        <div class="text-danger mt-1" *ngIf="form.get('accountName')?.invalid && form.get('accountName')?.touched">
+          Account Name is required
+        </div>
+      </div>
+
+      <!-- Account Name EN -->
+      <div class="mb-3">
+        <label class="form-label">Account Name (English)</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="accountNameEn"
+          placeholder="Enter account name in English"
+        />
+      </div>
+
+      <!-- Title -->
+      <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="title"
+          placeholder="Enter title"
+        />
+      </div>
+
+      <!-- Title EN -->
+      <div class="mb-3">
+        <label class="form-label">Title (English)</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="titleEn"
+          placeholder="Enter title in English"
+        />
+      </div>
+
+      <!-- Transferred To -->
+      <div class="mb-3">
+        <label class="form-label">Transferred To</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="transferredTo"
+        />
+      </div>
+
+      <!-- Transferred To EN -->
+      <div class="mb-3">
+        <label class="form-label">Transferred To (English)</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="transferredToEn"
+        />
+      </div>
+
+      <!-- Notes -->
+      <div class="mb-3">
+        <label class="form-label">Notes</label>
+        <textarea
+          rows="3"
+          class="form-control"
+          formControlName="notes">
+        </textarea>
+      </div>
+
+      <!-- Parent Main Account -->
+      <div class="mb-3">
+        <label class="form-label">Parent Main Account</label>
+        <select class="form-select" formControlName="parentMainAccountId">
+          <option [ngValue]="null">Select Parent Account</option>
+          <!-- Example loop -->
+          <option *ngFor="let account of parentAccounts"
+                  [value]="account.id">
+            {{ account.accountName }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Is Active -->
+      <div class="form-check form-switch mb-4">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          formControlName="isActive"
+        />
+        <label class="form-check-label">
+          Active
+        </label>
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-end gap-2">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="router.navigate(['/main-accounts'])">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="form.invalid">
+          Save
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
