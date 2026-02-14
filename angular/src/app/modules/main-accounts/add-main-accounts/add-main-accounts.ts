@@ -5,13 +5,38 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LocalizationPipe } from '@abp/ng.core';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 
 @Component({
   selector: 'app-add-main-accounts',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, LocalizationPipe],
   templateUrl: './add-main-accounts.html',
-  styleUrl: './add-main-accounts.scss'
+  styleUrl: './add-main-accounts.scss',
+  animations: [
+    trigger('cardEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(24px) scale(0.98)' }),
+        animate('450ms cubic-bezier(0.34, 1.56, 0.64, 1)', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+      ])
+    ]),
+    trigger('formStagger', [
+      transition(':enter', [
+        query('.form-group-anim', [
+          style({ opacity: 0, transform: 'translateX(-20px)' }),
+          stagger(50, [
+            animate('300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)', style({ opacity: 1, transform: 'translateX(0)' }))
+          ])
+        ], { optional: true })
+      ])
+    ]),
+    trigger('headerEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-10px)' }),
+        animate('350ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class AddMainAccounts implements OnInit {
 

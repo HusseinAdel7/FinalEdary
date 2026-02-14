@@ -1,32 +1,34 @@
-<div class="list-header">
-  <button type="button" class="btn btn-primary" routerLink="/main-accounts/create">
-    {{ 'MainAccount::AddMainAccount' | abpLocalization }}
-  </button>
-</div>
+<div class="main-accounts-list" @pageEnter>
+  <div class="list-header">
+    <button type="button" class="btn-add" routerLink="/main-accounts/create" @buttonEnter>
+      <span class="btn-icon">+</span>
+      {{ 'MainAccount::AddMainAccount' | abpLocalization }}
+    </button>
+  </div>
 
-<div *ngIf="accounts?.length > 0; else noData">
-  <div class="table-wrapper">
-    <table class="table" id="tblGrid">
-      <thead>
-        <tr>
-          <th>{{ 'MainAccount::AccountNumber' | abpLocalization }}</th>
-          <th>{{ 'MainAccount::AccountName' | abpLocalization }}</th>
-          <th>{{ 'MainAccount::Title' | abpLocalization }}</th>
-          <th>{{ 'MainAccount::TransferredTo' | abpLocalization }}</th>
-          <th>{{ 'MainAccount::Status' | abpLocalization }}</th>
-          <th>{{ 'MainAccount::CreatedDate' | abpLocalization }}</th>
-          <th>{{ 'MainAccount::Actions' | abpLocalization }}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <ng-container *ngFor="let account of accounts; trackBy: trackById">
+  <div *ngIf="accounts?.length > 0; else noData">
+    <div class="table-wrapper" @tableEnter>
+      <table class="table" id="tblGrid">
+        <thead>
           <tr>
-            <td data-label="Account Number">{{ account.accountNumber || '-' }}</td>
-            <td data-label="Account Name">{{ account.accountName | bilingualName:account.accountNameEn }}</td>
-            <td data-label="Title">{{ account.title | bilingualName:account.titleEn }}</td>
-            <td data-label="Transferred To">{{ account.transferredTo | bilingualName:account.transferredToEn }}</td>
-            <td data-label="Status">
+            <th>{{ 'MainAccount::AccountNumber' | abpLocalization }}</th>
+            <th>{{ 'MainAccount::AccountName' | abpLocalization }}</th>
+            <th>{{ 'MainAccount::Title' | abpLocalization }}</th>
+            <th>{{ 'MainAccount::TransferredTo' | abpLocalization }}</th>
+            <th>{{ 'MainAccount::Status' | abpLocalization }}</th>
+            <th>{{ 'MainAccount::CreatedDate' | abpLocalization }}</th>
+            <th>{{ 'MainAccount::Actions' | abpLocalization }}</th>
+          </tr>
+        </thead>
+
+        <tbody @rowStagger>
+          <ng-container *ngFor="let account of accounts; trackBy: trackById">
+            <tr class="data-row">
+            <td [attr.data-label]="'MainAccount::AccountNumber' | abpLocalization">{{ account.accountNumber || '-' }}</td>
+            <td [attr.data-label]="'MainAccount::AccountName' | abpLocalization">{{ account.accountName | bilingualName:account.accountNameEn }}</td>
+            <td [attr.data-label]="'MainAccount::Title' | abpLocalization">{{ account.title | bilingualName:account.titleEn }}</td>
+            <td [attr.data-label]="'MainAccount::TransferredTo' | abpLocalization">{{ account.transferredTo | bilingualName:account.transferredToEn }}</td>
+            <td [attr.data-label]="'MainAccount::Status' | abpLocalization">
               <span
                 class="status"
                 [class.active]="account.isActive"
@@ -34,10 +36,10 @@
                 {{ (account.isActive ? 'MainAccount::Active' : 'MainAccount::Inactive') | abpLocalization }}
               </span>
             </td>
-            <td data-label="Created Date">
+            <td [attr.data-label]="'MainAccount::CreatedDate' | abpLocalization">
               {{ account.creationTime | date:'medium' }}
             </td>
-            <td data-label="Actions" class="actions-cell">
+            <td [attr.data-label]="'MainAccount::Actions' | abpLocalization" class="actions-cell">
               <a [routerLink]="['/main-accounts/edit', account.id]" class="btn btn-sm btn-outline-primary me-1">
                 {{ 'MainAccount::Update' | abpLocalization }}
               </a>
@@ -49,11 +51,11 @@
 
           <ng-container *ngIf="account.children?.length > 0">
             <tr *ngFor="let child of account.children" class="child-row">
-              <td data-label="Account Number">{{ child.accountNumber || '-' }}</td>
-              <td data-label="Account Name">{{ child.accountName | bilingualName:child.accountNameEn }}</td>
-              <td data-label="Title">{{ child.title | bilingualName:child.titleEn }}</td>
-              <td data-label="Transferred To">{{ child.transferredTo | bilingualName:child.transferredToEn }}</td>
-              <td data-label="Status">
+              <td [attr.data-label]="'MainAccount::AccountNumber' | abpLocalization">{{ child.accountNumber || '-' }}</td>
+              <td [attr.data-label]="'MainAccount::AccountName' | abpLocalization">{{ child.accountName | bilingualName:child.accountNameEn }}</td>
+              <td [attr.data-label]="'MainAccount::Title' | abpLocalization">{{ child.title | bilingualName:child.titleEn }}</td>
+              <td [attr.data-label]="'MainAccount::TransferredTo' | abpLocalization">{{ child.transferredTo | bilingualName:child.transferredToEn }}</td>
+              <td [attr.data-label]="'MainAccount::Status' | abpLocalization">
                 <span
                   class="status"
                   [class.active]="child.isActive"
@@ -61,10 +63,10 @@
                   {{ (child.isActive ? 'MainAccount::Active' : 'MainAccount::Inactive') | abpLocalization }}
                 </span>
               </td>
-              <td data-label="Created Date">
+              <td [attr.data-label]="'MainAccount::CreatedDate' | abpLocalization">
                 {{ child.creationTime | date:'medium' }}
               </td>
-              <td data-label="Actions" class="actions-cell">
+              <td [attr.data-label]="'MainAccount::Actions' | abpLocalization" class="actions-cell">
                 <a [routerLink]="['/main-accounts/edit', child.id]" class="btn btn-sm btn-outline-primary me-1">
                   {{ 'MainAccount::Update' | abpLocalization }}
                 </a>
@@ -81,7 +83,9 @@
 </div>
 
 <ng-template #noData>
-  <div class="alert" role="alert">
-    {{ 'MainAccount::NoAccountsFound' | abpLocalization }}
+  <div class="empty-state" role="alert" @noDataEnter>
+    <div class="empty-state-icon">📋</div>
+    <p class="empty-state-text">{{ 'MainAccount::NoAccountsFound' | abpLocalization }}</p>
   </div>
 </ng-template>
+</div>
