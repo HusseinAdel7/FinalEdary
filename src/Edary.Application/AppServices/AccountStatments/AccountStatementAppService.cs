@@ -1,4 +1,5 @@
-﻿using Edary.DTOs.AccountStatments;
+﻿using Edary.DTOs;
+using Edary.DTOs.AccountStatments;
 using Edary.IAppServices.Edary.IAppServices;
 using Edary.Permissions;
 using Edary.Services.AccountStatments;
@@ -24,13 +25,20 @@ namespace Edary.AppServices.AccountStatments
             _manager = manager;
         }
 
-        public async Task<List<AccountStatementLineDto>> GetAsync(AccountStatementInputDto input)
+        public async Task<List<AccountStatementLineDto>> GetByAccountAsync(
+            AccountStatementInputDto input)
         {
-            if (string.IsNullOrWhiteSpace(input.AccountId))
-                throw new AbpValidationException("الحساب مطلوب");
-
-            return await _manager.GenerateAsync(
+            return await _manager.GenerateByAccountAsync(
                 input.AccountId,
+                input.FromDate,
+                input.ToDate ?? Clock.Now
+            );
+        }
+
+        public async Task<List<AccountStatementLineDto>> GetAllAsync(
+            AccountStatementPeriodDto input)
+        {
+            return await _manager.GenerateAllAsync(
                 input.FromDate,
                 input.ToDate ?? Clock.Now
             );

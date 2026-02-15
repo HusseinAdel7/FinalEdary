@@ -1,4 +1,5 @@
-﻿using Edary.DTOs.AccountStatments;
+﻿using Edary.DTOs;
+using Edary.DTOs.AccountStatments;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +13,12 @@ namespace Edary.IAppServices
     {
         public interface IAccountStatementAppService : IApplicationService
         {
-            Task<List<AccountStatementLineDto>> GetAsync(AccountStatementInputDto input);
+            // 1️⃣ كشف حساب لحساب معين
+            Task<List<AccountStatementLineDto>> GetByAccountAsync(AccountStatementInputDto input);
+
+            // 2️⃣ كشف حساب لكل الحسابات
+            Task<List<AccountStatementLineDto>> GetAllAsync(AccountStatementPeriodDto input);
         }
     }
 }
+
