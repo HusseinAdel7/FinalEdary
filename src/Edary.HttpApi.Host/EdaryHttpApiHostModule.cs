@@ -94,10 +94,10 @@ public class EdaryHttpApiHostModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-        Configure<AbpMvcLibsOptions>(options =>
-        {
-            options.CheckLibs = false;
-        });
+        //Configure<AbpMvcLibsOptions>(options =>
+        //{
+        //    options.CheckLibs = false;
+        //});
 
         if (!configuration.GetValue<bool>("App:DisablePII"))
         {

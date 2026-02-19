@@ -1,8 +1,10 @@
+import * as AccountStatments from './account-statments';
 import * as Invoices from './invoices';
 import * as Items from './items';
 import * as JournalEntries from './journal-entries';
 import * as MainAccounts from './main-accounts';
 import * as SubAccounts from './sub-accounts';
 import * as Suppliers from './suppliers';
+import * as TrailBalances from './trail-balances';
 import * as Warehouses from './warehouses';
-export { Invoices, Items, JournalEntries, MainAccounts, SubAccounts, Suppliers, Warehouses };
+export { AccountStatments, Invoices, Items, JournalEntries, MainAccounts, SubAccounts, Suppliers, TrailBalances, Warehouses };
