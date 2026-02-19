@@ -20,7 +20,7 @@ export const environment = {
   oAuthConfig,
   apis: {
     default: {
-      url: 'https://localhost:44354',
+      url: 'https://edaryabp-production.up.railway.app/',
       rootNamespace: 'Edary',
     },
     AbpAccountPublic: {
